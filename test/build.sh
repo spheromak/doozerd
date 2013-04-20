@@ -16,6 +16,6 @@ then
     touch $KITCHEN_DIR/prepared
 fi
 
-foodcritic -f ~FC007 -f ~FC034 . || exit 1
+foodcritic  . || exit 1
 knife cookbook test -o .. $(basename $PWD) || exit 1
 kitchen test
