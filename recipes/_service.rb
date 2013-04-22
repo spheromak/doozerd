@@ -14,6 +14,7 @@ template "#{node[:doozerd][:init_path]}/doozerd" do
   # for now use the attribute, some wrapper could use search/discovery 
   # and probably should.
   variables( 
+    :doozer_bin_path => "#{node[:doozer][:prefix]}/doozer"
     :doozer_nodes => node[:doozerd][:nodes],
     :doozer_host  => node[:doozerd][:host],
     :doozer_port  => node[:doozerd][:port]
