@@ -5,20 +5,35 @@
 #
 # Manage the Doozerd service
 #
+#
 
+# nodes in the cluster. should assemble this with discover or somehting else
+# for now use attribs
+attach_args = ""
+unless node[:doozerd][:nodes].empty? 
+  attach_args = "-a " + node[:doozerd][:nodes].join("-a ")
+end
 
-template "#{node[:doozerd][:init_path]}/doozerd" do
-  notifies :restart, "service[doozerd]"
-  source "doozer_init.erb"
-  mode 0755
-  # for now use the attribute, some wrapper could use search/discovery 
-  # and probably should.
-  variables( 
-    :doozer_bin_path => "#{node[:doozer][:prefix]}/doozer"
-    :doozer_nodes => node[:doozerd][:nodes],
-    :doozer_host  => node[:doozerd][:host],
-    :doozer_port  => node[:doozerd][:port]
-  )
+# if we have a cluster boot uri use it in the init
+if node[:doozerd][:boot_uri] 
+  boot_uri = "-b #{node[:doozerd][:boot_uri]}"
+end
+
+if node[:doozerd][:use_upstart] == true
+  template "/etc/init/doozerd.conf" do
+    source "upstart.erb"
+    variables(
+      :boot_uri       => boot_uri,
+      :attach_address => attach_args,
+      :cluster_name   => node[:doozerd][:cluster_name],
+      :listen_address => "#{node[:doozerd][:bind]}:#{node[:doozerd][:port]}"
+    )
+  end
+
+  service "doozerd" do 
+    action :nothing
+    provider Chef::Provider::Service::Upstart
+  end
 end
 
 

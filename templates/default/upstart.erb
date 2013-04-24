@@ -1,0 +1,10 @@
+# doozerd upstart created by chef 
+
+description     "doozerd clustered lock service"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+
+exec doozerd <%= @attach_address %> <%= @boot_uri %> -c <%= @cluster_name %> -l <%= @listen_address %>
